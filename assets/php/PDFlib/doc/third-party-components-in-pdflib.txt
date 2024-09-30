@@ -1,0 +1,25 @@
+Third-party components used in the following products:
+
+- PDFlib, PDFlib+PDI and PDFlib Personalization Server (PPS)
+- PDFlib Block Plugin    
+        
+        
+Component                         PDFlib    Block Plugin
+--------------------------------------------------------
+Adobe CMap resources              X
+AES, Arcfour and SHA algorithms   X         X
+Expat XML parser                  X         X
+ICClib                            X         X
+ICU                               X         X
+Koblas GIF reader                 X         X
+libjpeg                           X         X
+libpng                            X         X
+libtiff                           X         X
+MD5 message digest                X         X
+sRGB ICC profile                  X         X
+wxWidgets GUI Library                       X
+zlib compression library          X         X
+
+
+See document "third-party-licenses.pdf" for the respective license documents
+and version/release date information.

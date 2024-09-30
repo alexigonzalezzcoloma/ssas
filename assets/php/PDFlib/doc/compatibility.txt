@@ -1,0 +1,322 @@
+API compatibility
+=================
+
+
+PPS, PPS API, Block Plugin and Acrobat versions
+===============================================
+          PPS    Block     Acrobat                       Acrobat
+PPS       API    Plugin    Windows                       macOS
+---------------------------------------------------------------------------
+9.0.0     10     5.0       8,9,X,XI                      8,9,X,XI
+9.0.1     10     5.1       8,9,X,XI                      8,9,X,XI
+9.0.2     10     5.2       8,9,X,XI                      8,9,X,XI
+9.0.3     10     5.3       8,9,X,XI                      8,9,X,XI
+9.0.4     10     5.4       8,9,X,XI                      8,9,X,XI
+9.0.5     10     5.5       8,9,X,XI,DC                   8,9,X,XI,DC
+9.0.6     10     5.6       8,9,X,XI,DC                   8,9,X,XI,DC
+9.0.7     10     5.7       8,9,X,XI,DC                   8,9,X,XI,DC
+9.1.0     10     5.10      8,9,X,XI,DC                   8,9,X,XI,DC
+9.1.1     10     5.11      8,9,X,XI,DC 2017              8,9,X,XI,DC 2017
+9.1.2     10     5.12      8,9,X,XI,DC 2018              8,9,X,XI,DC 2018
+9.2.0     10     5.20      8,9,X,XI,DC 2019                       DC 2019
+9.3.0     10     5.30      8,9,X,XI,DC 2020                       DC 2020
+9.3.1     10     5.31      8,9,X,XI,DC 2021 (32/64-bit)           DC 2021
+
+
+
+PDFlib version numbers and .NET Core version numbers
+====================================================
+
+.NET Core introduced a separate versioning scheme; it does not apply to the
+Classic .NET binding.
+
+PDFlib     .NET Core
+--------------------
+9.1.2px    1.2.x		(9.1.2p8 is the first version for .NET Core)
+9.2.0px    2.0.x
+9.3.0px    3.0.x
+9.3.1px    3.1.x
+
+
+Removal of deprecated API Features
+==================================
+In the future all API methods, options and keywords which are designated
+as "deprecated" will be removed. These methods and options should be replaced
+in application code.
+
+The "PDFlib Migration Guide" contains a list of all affected methods and
+options along with their replacements. The Migration Guide also explains
+methods for identifying deprecated features.
+
+It is strongly recommended to review the Migration Guide and avoid the
+use of deprecated features in application code to ensure forward compatibility.
+
+
+PDFlib 9.3.x
+============
+- C++ binding: custom string types in the C++ binding didn't work as
+  expected and are no longer supported.
+
+
+PDFlib 9.3.1
+============
+- PHP binding: the functional interface is deprecated in favor of the
+  object-oriented interface. This deprecation has been declared long ago,
+  but PDFlib now also emits a warning for the deprecated API functions.
+  
+- PostScript Type 1 fonts are deprecated.
+
+
+PDFlib 9.3.0
+============
+PDF_create_field() and PDF_create_fieldgroup():
+- Form fields with type=checkbox and radiobutton: either the font
+  ZapfDingbats with encoding "builtin" or the free Erler Dingbats font
+  with encoding "dingbats" must be available for embedding.
+  
+- Field names must now be unique in a document. Fields with synchronized
+  values can be created by creating a field group with suitable "fieldtype"
+  option.
+
+- Fonts for use in form fields should be loaded with the "embedding" option.
+
+- Improved exception handling in the Python binding resulted in changes
+  in the arguments of the PDFlibException object. Previously it contained
+  a single string containing the error number, method name and error
+  description. These components are now available as separate members of
+  the PDFlibException object and can easily be used. For example, print(ex)
+  prints the following triple:
+
+  "(1400, 'set_option', "Unknown option 'search'")"
+
+  instead of the previous combined message
+  "PDFlib Error [1400] set_option: Unknown option 'search'"
+
+- PHP binding: the delete() method is deprecated.
+
+
+PDFlib 9.2.0
+============
+
+PDF/UA-1
+--------
+The "lang" option of PDF_begin_document() is now required in PDF/UA-1 mode.
+This is necessary because the natural language for some items cannot be
+declared otherwise, including the required dc:title XMP property. This
+also fixes PAC validation problems with missing language identification
+of bookmarks, form fields and annotations.
+
+
+Bindings
+--------
+- C binding:
+  PDF_open_pdi_callback() did not work correctly with large files >2GB
+  on Windows and z/OS. Fixing this required a small change in the declaration
+  of PDF_open_pdi_callback() and the seekproc callback function.
+
+
+PDFlib 9.1.2
+============
+The simple text output functions PDF_show_xy() etc. by default no longer
+emit ActualText for glyphs in a font which are used to represent multiple
+different Unicode values if "passthrough" text output mode is active.
+The previous behavior can be restored by setting any of the text filter
+options "charref=true" or "escapesequence=true" (or the unsupported
+text filter option "passthrough=false").
+
+
+.NET binding
+------------
+PDFlib.NET for .NET Framework 4.0 and above now requires the runtime libraries 
+from Visual Studio 2015; see PDFlib-in-.NET-HowTo.pdf for details.
+
+
+Tagged PDF
+----------
+PDF_begin_item() and "tag" suboption of various API functions:
+consolidated the PDF 1.7 tag nesting rules with the PDF 2.0 rules for
+consistency. This involved some incompatible changes (stricter rules)
+for rarely used parent/child combinations of tags.
+
+Incompatible nesting rule changes (stricter nesting rules):
+- RB, RT, and RP can only be children of Ruby
+- WT and WP can only be children of Warichu
+- Document may not contain Caption
+- Caption is no longer allowed to contain Document and Caption
+- H, H1 etc. are no longer allowed to contain Document, Part, and Div
+- TH and TD are no longer allowed to contain Document and Caption
+- Inline elements with inline=false are no longer allowed to contain L, Table
+  or Document
+
+Compatible nesting rule change (relaxed nesting rule):
+- Caption may contain Ruby and Warichu
+
+
+PDFlib 9.1.1
+============
+The option "transparencygroup" of PDF_open_pdi_page() and PDF_load_graphics()
+is now forced to "auto" in PDF/A-2/3 and PDF/X-4/5 modes to ensure standard-
+conforming output with a suitable blend color space and group isolation.
+
+Imported or automatically created transparency groups for imported pages are
+now always isolated. As a result the whole imported page is blended with the
+existing background. If you need the previous behavior where individual parts
+of the imported page blend against the background use the following option of
+PDF_open_pdi_page():
+
+"transparencygroup={isolated=false}"
+
+PDF_open_pdi_document(): if uselayers=false is supplied no other documents
+can be imported with layers. Vice versa, as soon as layers have been defined
+directly with PDF_define_layer() or indirectly with PDF_open_pdi_document()
+with uselayers=true the option uselayers=false is no longer allowed. This
+is required to comply with the PDF requirement that all layers must be listed
+in the OCProperties structure.
+
+
+PDFlib 9.1
+==========
+Changes in PDF_create_field():
+Changed the font encoding handling for form fields to work around
+display problems in Acrobat: for type=checkbox and radiobutton in
+PDF_create_field() no font is required. If a font is specified, only
+ZapfDingbats with encoding=builtin is accepted.
+Fonts loaded with encoding=unicode will not be loaded automatically with 
+encoding=winansi again. It is recommended to load TrueType/OpenType fonts
+with an 8-bit encoding and the option "simplefont".
+
+
+
+PDFlib 9.0.7
+============
+- PDF_set_layer_dependency(): removed unsupported type=Variant and
+  corresponding layer variant options from the PDFlib API Reference.
+
+- PDF_create_annotation(), option "name": the names must be unique on each
+  page, but PDFlib issued only a warning. If a duplicate name is supplied,
+  the function call now fails to prevent inconsistent PDF output.
+
+- PDF_create_pvf(): the default of the "copy" option has been changed from
+  "false" to "true" for all language bindings except C/C++. This temporarily
+  requires more memory, but avoids spurious memory problems in situations
+  where the language's garbage collector no longer has a reference to the
+  memory.
+  
+- PDF_fit_table() now supports fitmethod=auto as follows: if the table box is
+  narrower than the fitbox it is enlarged to the fitbox width. This slightly
+  changes the previously undocumented behavior of fitmethod=auto for tables.  
+
+
+PDFlib 9.0.6
+============
+No changes which affect compatibility.
+
+
+PDFlib 9.0.5
+============
+PDF_open_pdi_document() no longer reads Tagged PDF structure by default if
+called in object scope, i.e. if no output document is open. If the PDI
+document is intended for use with a Tagged PDF output document, the option
+usetags=true must be provided.
+
+
+PDFlib 9.0.4
+============
+No changes which affect compatibility.
+
+
+PDFlib 9.0.3
+============
+No changes which affect compatibility.
+
+
+
+PDFlib 9.0.2
+============
+
+Font handling
+-------------
+Due to feature #1625 and bug #4559 (modified treatment of fonts for form
+fields) fonts may now be embedded by default. If this is not desired font
+embedding can be disabled with "embedding=false".
+
+
+Tagged PDF
+----------
+Artifacts are no longer allowed when the currently active element is a
+pseudo element or one of Span, Quote, Note, Reference, BibEntry, Code with
+inline=true.
+
+
+PDFlib 9.0.1
+============
+
+XMP metadata
+------------
+Implemented stricter XMP namespace checks for PDF/A-2 and PDF/A-3 to
+follow the XMP 2005 spec and match the behavior of Acrobat Preflight:
+namespace URIs are now required to end in a "/" or "#" character.
+Otherwise the XMP will be rejected.
+
+
+Tagged PDF
+----------
+Modified the handling of H7, H8 etc. so that they are no longer treated
+as standard elements, but require rolemap entries. Since PDF/UA consumers
+are advised to ignore the rolemapping PDFlib also ignores the rolemaps
+of H7 etc. in PDF/UA mode (other than writing them to the PDF output).
+
+
+PDFlib 9.0
+==========
+
+Modified Functionality
+----------------------
+PDI:
+The checks for PDF/A, PDF/X and PDF/UA compatibility were moved from
+PDF_open_pdi_document() to PDF_open_pdi_page(). This may slightly change
+the behavior of applications since incompatible documents can now be opened,
+but no pages can be imported from such documents.
+
+PDI now imports layer definitions by default. As a result the output contains
+layer definitions if the input contains layers. Previously all layer
+definitions were dropped upon import. In order to restore the previous
+behavior supply the option uselayers=false in PDF_open_pdi_document().
+
+Layers for PDF/X:
+PDF_set_layer_dependency(): changed the default of "createorderlist" to
+"true" also in the PDF/X case to improve compatibility with Acrobat X.
+
+Image clipping paths:
+If the "clippingpathname" of PDF_load_image() was supplied although the image
+does not contain any clipping path at all, the option was silently ignored.
+Now PDF_load_image() correctly emits an error "Couldn't find clipping path".
+
+Image orientation for JPEG images:
+PDF_load_image() now interprets the orientation tag in the Exif marker of
+JPEG images and automatically rotates the image accordingly. The image output
+looks different than with PDFlib <= 8 if the orientation tag is different
+from 1.
+Workaround: use the option ignoreorientation=true in PDF_load_image() or
+PDF_fit_image()
+
+sRGB treatment of JPEG images with Exif marker:
+JPEG images with an Exif marker which contains the entry "uncalibrated
+colorspace" are no longer treated as sRGB, but rather as DeviceRGB to
+match the Exif specification. Such images are very rare, though.
+Workaround: you can force sRGB handling by supplying the "iccprofile" option
+to PDF_load_image().
+
+Tagged PDF:
+PDF_begin_item() and the "tag" option of various functions reject the "Alt"
+or "ActualText" option if some ancestor in the structure hierarchy already
+has the same attribute.
+The "taborder" option of PDF_begin/end_page_ext() has the new default
+"structure" in Tagged PDF mode (previously: "none") in order to work around
+problems in Tagged PDF validators.
+
+Nesting of tags is now checked according to ISO 32000-1. This may result
+in exceptions for applications which apply tags in wrong nesting order. The
+checks can be disabled with the document option "checktags=none" to migrate
+legacy applications. However, it is strongly recommended to adjust the
+application code to work with checktags=strict to ensure accessible PDF output.
