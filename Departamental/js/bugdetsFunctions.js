@@ -150,8 +150,7 @@ function listSchoolsWithOutBugdets(destiny){
 }
 
 function openModalAddSchoolBugdet(){
-    listSchoolsWithOutBugdets('addBugdetSSchool');
-
+    //listSchoolsWithOutBugdets('addBugdetSSchool');
     $('#addBugdetBySchool').modal('show');
 }
 

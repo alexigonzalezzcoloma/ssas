@@ -1,7 +1,7 @@
 <?php 
 session_start();
 if (isset($_SESSION['user_rut'])){
-    if ($_SESSION["id_rol"] == '5'){
+    if ($_SESSION["id_rol"] == '2'){
         $userName=$_SESSION["name"];
         require_once "../assets/php/connection.php";
         $connection=connection();
@@ -21,7 +21,7 @@ if (isset($_SESSION['user_rut'])){
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Gestion de Presupuestos</title>
+    <title>Gestión de Presupuestos</title>
     <meta name="description" content="Sistema de Seguimiento y Autorizacion de Solicitudes">
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i">
@@ -40,10 +40,10 @@ if (isset($_SESSION['user_rut'])){
                 </a>
                 <hr class="sidebar-divider my-0">
                 <ul class="nav navbar-nav text-light" id="accordionSidebar">
-                <li class="nav-item"><a class="nav-link" href="inicio.php"><i class="fas fa-tachometer-alt"></i><span>Mi Bandeja</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="inicio.php"><i class="fas fa-tachometer-alt"></i><span>Mi Bandeja</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="solicitudes-pendientes.php"><i class="fas fa-comment-slash"></i><span>Pendientes</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="PME.php"><i class="far fa-list-alt"></i><span>Gestión PME</span></a></li>
                     <li class="nav-item"><a class="nav-link active" href="presupuestos.php"><i class="far fa-money-bill-alt"></i><span>Presupuestos</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="comision-interna.php"><i class="fas fa-comment-slash"></i><span>Gestion Comisión</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="perfil.php"><i class="fas fa-user"></i><span>Perfil</span></a></li>
                     <li class="nav-item"><a class="nav-link" href="../inicio_sesion.php"><i class="far fa-user-circle"></i><span>Cerrar Sesión</span></a></li>
                 </ul>
@@ -59,7 +59,7 @@ if (isset($_SESSION['user_rut'])){
                         </form>
                         <div class="btn-group" style="height: 30px;font-size: 10px;padding: 0px;margin: 0px;">
                             <select class="btn btn-primary" name="yearFilter" id="yearFilter" type="button" style="padding: 3px;">
-                                <option value="2025">2025</option>
+                                <option value="2022">2022</option>
                                 <option value="2021">2021</option>
                             </select>
                         </div>
@@ -77,7 +77,7 @@ if (isset($_SESSION['user_rut'])){
                         </li>
                         <div class="d-none d-sm-block topbar-divider"></div>
                         <li class="nav-item dropdown no-arrow">
-                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small"><?php echo $userName;?> - Director/a</span></a>
+                            <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#"><span class="d-none d-lg-inline mr-2 text-gray-600 small"><?php echo $userName;?> - Tesorer@ Educación</span></a>
                                 <div class="dropdown-menu shadow dropdown-menu-right animated--grow-in"><a class="dropdown-item" href="perfil.php"><i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Perfil</a>
                                         <div class="dropdown-divider"></div><a class="dropdown-item" href="../inicio_sesion.php"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>&nbsp;Salir</a></div>
                             </div>
@@ -88,9 +88,10 @@ if (isset($_SESSION['user_rut'])){
             <div class="container-fluid">
             <div class="card shadow">
                     <div class="card-header py-3">
-                        <p class="text-primary m-0 font-weight-bold">Nivel Colegio</p>
+                        <p class="text-primary m-0 font-weight-bold">Presupuestos por Colegios</p>
                     </div>
                     <div class="card-body">
+                        <button class="btn btn-success" onclick="openModalAddSchoolBugdet()" type="button">Agregar Presupuesto</button><br><br>
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
@@ -99,39 +100,44 @@ if (isset($_SESSION['user_rut'])){
                                         <th>Monto Total</th>
                                         <th>Monto Usado</th>
                                         <th>Monto Disponible</th>
+                                        <th>Editar</th>
                                     </tr>
                                 </thead>
                                 <tbody id="listSchoolBugdet">
                                     
                                 </tbody>
                             </table>
-                </div>
-                        
-                </div>
-            </div><br>
-            <div class="card shadow">
+                        </div><br></div>
+                </div><br>
+
+                <div class="card shadow">
                     <div class="card-header py-3">
-                        <p class="text-primary m-0 font-weight-bold">Nivel Subvenciones</p>
+                        <p class="text-primary m-0 font-weight-bold">Presupuestos por Subvenciones</p>
                     </div>
                     <div class="card-body">
+                        <label>Seleccione Colegio</labeL>
+                        <select class="form-control" name="selectSchool" id="selectSchool">
+                            <option value="">Colegio 1</option>
+                        </select>
+                        <br>
+                        <button class="btn btn-success" type="button" onclick="openModalAddSubBugdet()">Agregar Presupuesto</button><br><br>
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Subvención</th>
+                                        <th>Subvencion</th>
                                         <th>Monto Total</th>
                                         <th>Monto Usado</th>
                                         <th>Monto Disponible</th>
+                                        <th>Editar</th>
                                     </tr>
                                 </thead>
-                                <tbody id="listSubsBugdets">
+                                <tbody id="listSubBugdets">
                                     
                                 </tbody>
                             </table>
-                        </div>
-                </div>
-            </div><br>
-
+                        </div><br></div>
+                </div><br>
                 
                 <!--<div class="card shadow">
                     <div class="card-header py-3">
@@ -198,8 +204,100 @@ if (isset($_SESSION['user_rut'])){
             </div>
         </div>
         <footer class="bg-white sticky-footer">
+            
+            
+            <div class="modal fade" role="dialog" tabindex="-1" id="addBugdetBySchool">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Agregar Presupuesto</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="">Seleccione Colegio</label>
+                                <select name="" id="addBugdetSSchool" class="form-control"></select>                            
+                            </div>
+                            <div class="form-group">
+                                <label>Monto</labeL>
+                                <input type="text" class="form-control" id="addBugdetSMount"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-light" type="button" data-dismiss="modal">Cancelar</button>
+                            <button class="btn btn-primary" type="button" onclick="addBugdetSchool()">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade" role="dialog" tabindex="-1" id="addBugdetBySub">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Agregar Presupuesto por Subvencion</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="">Seleccione Subvención</label>
+                                <select name="" id="addBugdetSSubId" class="form-control"></select>                            
+                            </div>
+                            <div class="form-group">
+                                <label>Monto</labeL>
+                                <input type="text" class="form-control" id="addBugdetSSubMount"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-light" type="button" data-dismiss="modal">Cancelar</button>
+                            <button class="btn btn-primary" type="button" onclick="addSubBugdet()">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="container my-auto">
                 <div class="text-center my-auto copyright"><span>Copyright © SSAS 2021</span></div>
+            </div>
+            
+            <div class="modal fade" role="dialog" tabindex="-1" id="editschoolBModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Edicion Presupuesto</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                        <div class="modal-body"><div class="form-group">
+                            <label>Id</labeL>
+                            <input type="text" class="form-control" id="editSchoolBID" readonly="readonly"/>
+                        </div><div class="form-group">
+                            <label>Colegio</labeL>
+                            <input type="text" class="form-control" id="editSchoolBRBD" readonly="readonly"/>
+                        </div><div class="form-group">
+                            <label>Monto</labeL>
+                            <input type="text" class="form-control" id="editSchoolBMount"/>
+                        </div></div>
+                        <div class="modal-footer"><button class="btn btn-light" type="button" data-dismiss="modal">Cerrar</button><button class="btn btn-primary" type="button" onclick="updateSchoolBugdet()">Guardar</button></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" role="dialog" tabindex="-1" id="editSubBModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Edicion Presupuesto Subvencion</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                        <div class="modal-body"><div class="form-group">
+                            <label>Id</labeL>
+                            <input type="text" class="form-control" id="editSubBID" readonly="readonly"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Subvención</labeL>
+                            <input type="text" class="form-control" id="editSubBname" readonly="readonly"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto</labeL>
+                            <input type="text" class="form-control" id="editSubBMount"/>
+                        </div></div>
+                        <div class="modal-footer"><button class="btn btn-light" type="button" data-dismiss="modal">Cerrar</button><button class="btn btn-primary" type="button" onclick="updateSubBugdet()">Guardar</button></div>
+                    </div>
+                </div>
             </div>
         </footer>
     </div><a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a></div>

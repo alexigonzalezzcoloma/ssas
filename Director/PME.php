@@ -56,7 +56,7 @@ if (isset($_SESSION['user_rut'])){
                         </form>
                         <div class="btn-group" style="height: 30px;font-size: 10px;padding: 0px;margin: 0px;">
                             <select class="btn btn-primary" name="yearFilter" id="yearFilter" type="button" style="padding: 3px;">
-                                <option value="2022">2022</option>
+                                <option value="2025">2025</option>
                                 <option value="2023">2023</option>
                             </select>
                         </div>
