@@ -1,5 +1,6 @@
 <?php 
 session_start();
+error_log("Acceso a Director/inicio.php con rol: " . ($_SESSION['id_rol'] ?? 'no set'));
 if (isset($_SESSION['user_rut'])){
     if ($_SESSION["id_rol"] == '5'){
         $schoolRbd=$_SESSION['rbd_colegio'];
@@ -8,10 +9,12 @@ if (isset($_SESSION['user_rut'])){
         $connection=connection();
     }else{
         echo "No estas autorizad@ para ingresar al perfil de Director";
+        exit;
     }
 }else{
     echo "<script>alert('No se detecta su sesión, por favor inicie sesión');</script>";
-    header("Location: ../inicio_sesion.php");   
+    header("Location: ../inicio_sesion.php");
+    exit;
 }
 
 ?>

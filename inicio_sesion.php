@@ -2,57 +2,85 @@
 session_start(); 
 require_once "assets/php/connection.php";
 $connection=connection();
+error_log("inicio_sesion.php loaded, connection: " . ($connection ? 'ok' : 'failed'));
 
 if(isset($_POST["login"])) {
     $rut = addslashes($_POST["user_rut"]);
     $rut=str_replace('.', '', $rut);
     $pass = $_POST["usr_pass"];
+    error_log("Login attempt for rut: $rut");
     $sql1 = "SELECT nombre,clave,id_rol,rbd_colegio,habilitado,rut_fundacion FROM usuarios WHERE rut='$rut' ";
     $result=mysqli_query($connection,$sql1);
+    error_log("Query executed, num rows: " . mysqli_num_rows($result));
 
     if(mysqli_num_rows($result)>0){
         while($var=mysqli_fetch_row($result)){
             if ($var[4]==1){
+                error_log("var[2] (id_rol from DB): " . $var[2]);
+                error_log("User enabled, rol from DB: $var[2]");
                 $GLOBALS['pass']= $GLOBALS['pass'];
                 $_SESSION["user_rut"] = $rut;
                 
                 $_SESSION["name"] = $var[0];
                 $_SESSION["id_rol"] = $var[2];
+                error_log("Session id_rol set to: " . $_SESSION["id_rol"]);
                 $_SESSION["rbd_colegio"] = $var[3];
                 $_SESSION["rut_fundacion"] = $var[5];
 
-                $rol_usuario= $_SESSION["id_rol"];
+                $rol_usuario= $var[2];
+                error_log("rol_usuario variable: $rol_usuario");
 
-                if ($rol_usuario=='1' && password_verify($pass, $var[1])){
-                    header("Location:Administracion/inicio.php");
-                }
-                if ($rol_usuario=='2' && password_verify($pass, $var[1])){
-                    header("Location:Departamental/inicio.php");
-                }   
-                if ($rol_usuario=='3' && password_verify($pass, $var[1])){
-                    header("Location:Tesorero-Fundacion/inicio.php");
-                }              
-                if ($rol_usuario=='4' && password_verify($pass, $var[1])){
-                    header("Location:Editor/inicio.php");
-                }
-                if ($rol_usuario=='5' && password_verify($pass, $var[1])){
-                    header("Location:Director/inicio.php");
-                }
-                if($rol_usuario=='6' && password_verify($pass, $var[1])){
-                    header("Location:Encargado-TI/inicio.php");
-                }
-                if($rol_usuario=='7' && password_verify($pass, $var[1])){
-                    header("Location:Encargado-GTH/inicio.php");
-                }
-                if($rol_usuario=='8' && password_verify($pass, $var[1])){
-                    header("Location:Revisor/inicio.php");
-                } 
-                if($rol_usuario=='9' && password_verify($pass, $var[1])){
-                    header("Location:Secretaria/inicio.php");
-                }                
-                
-                if (password_verify($pass, $var[1])==FALSE){
-                    echo"<script> alert('Crendenciales erróneas'); </script>";
+                echo "<script>console.log('Rol del usuario antes de verificar contraseña: $rol_usuario');</script>";
+                error_log("Rol del usuario: $rol_usuario");
+
+                if (password_verify($pass, $var[1])) {
+                    switch ($rol_usuario) {
+                        case '1':
+                            echo "<script>console.log('Iniciando sesión como Administrador');</script>";
+                            header("Location:Administracion/inicio.php");
+                            break;
+                        case '2':
+                            echo "<script>console.log('Iniciando sesión como Departamental');</script>";
+                            header("Location:Departamental/inicio.php");
+                            break;
+                        case '3':
+                            echo "<script>console.log('Iniciando sesión como Tesorero de la Fundación');</script>";
+                            header("Location:Tesorero-Fundacion/inicio.php");
+                            break;
+                        case '4':
+                            echo "<script>console.log('Iniciando sesión como Editor');</script>";
+                            header("Location:Editor/inicio.php");
+                            break;
+                        case '5':      
+                            echo "<script>console.log('Iniciando sesión como Director');</script>";
+                            header("Location:Director/inicio.php");
+                            break;
+                        case '6':
+                            echo "<script>console.log('Iniciando sesión como Encargado de TI');</script>";
+                            header("Location:Encargado-TI/inicio.php");
+                            break;
+                        case '7':
+                            echo "<script>console.log('Iniciando sesión como Encargado de GTH');</script>";
+
+                            header("Location:Encargado-GTH/inicio.php");
+                            break;
+                        case '8':
+                            echo "<script>console.log('Iniciando sesión como Revisor');</script>";
+
+                            header("Location:Revisor/inicio.php");
+                            break;
+                        case '9':
+                            echo "<script>console.log('Iniciando sesión como Secretaria');</script>";
+                            header("Location:Secretaria/inicio.php");
+                            break;
+                        default:
+                            error_log("Rol no reconocido: '$rol_usuario'");
+                            echo "<script>alert('Rol de usuario inválido: $rol_usuario');</script>";
+                            break;
+                    }
+                    exit;
+                } else {
+                    echo"<script> alert('Credenciales erróneas'); </script>";
                     echo "<form action='inicio_sesion.php' method='post'>";
                 }
             }else{
@@ -123,6 +151,13 @@ mysqli_close($connection);
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.js"></script>
     <script src="assets/js/theme.js"></script>
+    <script>
+        <?php if (isset($_SESSION["id_rol"])) { ?>
+            console.log("Rol del usuario: <?php echo $_SESSION['id_rol']; ?>");
+        <?php } else { ?>
+            console.log("No hay sesión activa o rol definido");
+        <?php } ?>
+    </script>
 </body>
 
 </html>

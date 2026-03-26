@@ -1,5 +1,6 @@
 <?php 
 session_start();
+error_log("Acceso a Editor/inicio.php con rol: " . ($_SESSION['id_rol'] ?? 'no set'));
 if (!isset($_SESSION['user_rut'])){
     echo "<script>alert('No se detecta su sesión, por favor inicie sesión');</script>";
     header("Location: ../inicio_sesion.php");
